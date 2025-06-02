@@ -22,7 +22,7 @@ def main():
     menu.run()
 
     # Game Loop
-    game_manager = GameManager(screen)
+    game_manager = GameManager()
     running = True
     while running:
         dt = clock.tick(FPS) / 1000  # Seconds passed since last frame

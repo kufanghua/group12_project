@@ -83,3 +83,5 @@ python -m unittest discover tests
 ## 授權
 
 MIT License
+
+https://github.com/copilot/share/82414088-4264-8c21-9003-f04244b549aa

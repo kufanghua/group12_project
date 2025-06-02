@@ -3,37 +3,20 @@ from src.entities.towers.base_tower import BaseTower
 from src.entities.projectiles.cannon_ball import CannonBall
 
 class CannonTower(BaseTower):
-    name = "Cannon"
+    name = "Cannon Tower"
     cost = 100
+    range = 120
+    attack_speed = 1.5
+    damage = 40
 
     def __init__(self, x, y, game_manager):
+        image = pygame.Surface((40, 40), pygame.SRCALPHA)
+        pygame.draw.circle(image, (170, 80, 80), (20, 20), 18)
+        pygame.draw.rect(image, (70, 50, 50), (12, 30, 16, 8))
         super().__init__(x, y, game_manager)
-        self.image = pygame.Surface((38, 38), pygame.SRCALPHA)
-        pygame.draw.rect(self.image, (120, 120, 120), (6, 6, 26, 26))
-        pygame.draw.circle(self.image, (90, 90, 90), (19, 19), 16, 4)
-        self.range = 110
-        self.damage = 50
-        self.fire_rate = 1.2
-        self.level = 1
-        self.upgrade_cost = 80
+        self.image = image
+        self.rect = self.image.get_rect(center=(x, y))
 
     def shoot(self, target):
-        bullet = CannonBall(self.x, self.y, target, self.damage, self.game_manager)
-        self.game_manager.projectiles.add(bullet)
-
-    def upgrade(self):
-        if self.level == 1:
-            self.level = 2
-            self.damage += 30
-            self.range += 20
-            self.fire_rate *= 1.15
-            self.upgrade_cost = 130
-            pygame.draw.circle(self.image, (170, 150, 90), (19, 19), 16, 4)
-        elif self.level == 2:
-            self.level = 3
-            self.damage += 50
-            self.range += 20
-            self.fire_rate *= 1.15
-            self.upgrade_cost = 200
-            pygame.draw.rect(self.image, (210, 170, 90), (12, 12, 14, 14))
-        # 可依需求增加更多等級
+        ball = CannonBall(self.x, self.y, target, self.damage, self.game_manager)
+        self.game_manager.add_projectile(ball)

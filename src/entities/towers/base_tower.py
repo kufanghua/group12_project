@@ -1,55 +1,40 @@
 import pygame
 from src.entities.base_entity import BaseEntity
+from src.utils.constants import TILE_SIZE
 
 class BaseTower(BaseEntity):
-    """
-    所有塔的基底類別，包含共通屬性與方法
-    """
+    name = "BaseTower"
+    cost = 50
+    range = 100
+    attack_speed = 1.0  # seconds
+    damage = 10
+
     def __init__(self, x, y, game_manager):
-        super().__init__(x, y)
+        image = pygame.Surface((TILE_SIZE, TILE_SIZE), pygame.SRCALPHA)
+        pygame.draw.circle(image, (120, 120, 120), (TILE_SIZE//2, TILE_SIZE//2), TILE_SIZE//2)
+        super().__init__(x, y, image)
         self.game_manager = game_manager
-        self.range = 100
-        self.damage = 10
-        self.fire_rate = 1.0  # 每秒射擊次數
-        self.last_shot = 0
-        self.level = 1
-        self.upgrade_cost = 100
+        self.attack_cooldown = 0
 
     def update(self, dt):
-        # 自動尋找最近敵人並攻擊
-        enemy = self.find_target()
-        if enemy:
-            self.last_shot += dt
-            if self.last_shot >= 1.0 / self.fire_rate:
-                self.shoot(enemy)
-                self.last_shot = 0
+        self.attack_cooldown -= dt
+        if self.attack_cooldown <= 0:
+            target = self.find_target()
+            if target:
+                self.shoot(target)
+                self.attack_cooldown = self.attack_speed
 
     def find_target(self):
-        # 找最近的敵人
-        min_dist = float('inf')
-        target = None
+        # 找到第一個在射程內的敵人
         for enemy in self.game_manager.enemies:
-            if not hasattr(enemy, "rect"):
-                continue
-            dist = ((self.x - enemy.rect.centerx) ** 2 + (self.y - enemy.rect.centery) ** 2) ** 0.5
-            if dist <= self.range and dist < min_dist and enemy.is_alive():
-                min_dist = dist
-                target = enemy
-        return target
+            if self.distance_to(enemy) <= self.range:
+                return enemy
+        return None
 
     def shoot(self, target):
-        # 子類別實作
-        pass
+        pass  # 子類覆寫
 
-    def upgrade(self):
-        # 子類別實作
-        pass
-
-    def draw(self, surface):
-        # 畫出塔
-        surface.blit(self.image, self.rect.topleft)
-        # 畫攻擊範圍（僅選中時可加，預設不畫）
-        # pygame.draw.circle(surface, (150,150,255,100), (self.x, self.y), self.range, 1)
-
-    def is_clicked(self, pos):
-        return self.rect.collidepoint(pos)
+    def distance_to(self, entity):
+        dx = self.x - entity.x
+        dy = self.y - entity.y
+        return (dx*dx + dy*dy) ** 0.5

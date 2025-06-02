@@ -16,10 +16,10 @@ class GameUI:
         self.font = pygame.font.SysFont(FONT_NAME, 22)
         self.tower_buttons = []
         self.selected_idx = None
+        self.selected_tower = None  # 新增：記錄點擊地圖的塔
         self._init_tower_buttons()
 
     def _init_tower_buttons(self):
-        # 設定塔按鈕區域(畫面左上)
         for i, (tower_cls, label) in enumerate(TOWER_CLASSES):
             rect = pygame.Rect(20 + i * 80, 45, 70, 70)
             self.tower_buttons.append((rect, tower_cls, label))
@@ -28,7 +28,6 @@ class GameUI:
         pass
 
     def draw(self, surface):
-        # 畫UI背景
         pygame.draw.rect(surface, UI_BG_COLOR, (0, 0, SCREEN_WIDTH, 40))
         money_txt = self.font.render(f"金錢: {self.game_manager.money}", True, (0, 80, 0))
         life_txt = self.font.render(f"生命: {self.game_manager.life}", True, (180, 0, 0))
@@ -37,37 +36,135 @@ class GameUI:
         surface.blit(life_txt, (150, 7))
         surface.blit(score_txt, (280, 7))
 
-        # 畫塔選擇按鈕區
         for i, (rect, tower_cls, label) in enumerate(self.tower_buttons):
-            # 選取效果
             if self.game_manager.selected_tower_type == tower_cls:
                 pygame.draw.rect(surface, (170, 200, 255), rect)
             else:
                 pygame.draw.rect(surface, (220, 220, 220), rect)
             pygame.draw.rect(surface, (60, 60, 90), rect, 2)
-            # 塔名
             txt = pygame.font.SysFont(FONT_NAME, 18).render(label, True, (30, 30, 80))
             surface.blit(txt, (rect.x + 3, rect.y + 8))
-            # 價格
             price = getattr(tower_cls, "cost", 100)
             price_txt = pygame.font.SysFont(FONT_NAME, 16).render(f"${price}", True, (80, 90, 20))
             surface.blit(price_txt, (rect.x + 6, rect.y + 40))
-        
-        # 若未選塔，提示
+
         if not self.game_manager.selected_tower_type:
             tip = self.font.render("請先點選上方塔種再蓋塔", True, (200, 40, 40))
             surface.blit(tip, (SCREEN_WIDTH//2 - tip.get_width()//2, 9))
 
+        # --- 升級UI ---
+        if self.selected_tower:
+            self.draw_upgrade_panel(surface, self.selected_tower)
+
     def handle_event(self, event):
-        # 處理塔按鈕區的點擊
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             pos = pygame.mouse.get_pos()
             for rect, tower_cls, _ in self.tower_buttons:
                 if rect.collidepoint(pos):
                     self.game_manager.selected_tower_type = tower_cls
-                    return True  # 事件被UI處理
+                    self.selected_tower = None
+                    return True
+            # 點擊地圖上塔
+            for tower in self.game_manager.towers:
+                if tower.rect.collidepoint(pos):
+                    self.selected_tower = tower
+                    self.game_manager.selected_tower_type = None
+                    return True
+            self.selected_tower = None
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
+            self.selected_tower = None
         return False
 
     def handle_click(self, pos):
-        # 非塔按鈕區的左鍵點擊（如需擴充UI可用）
+        # 不再需要，直接在 handle_event 檢查
         pass
+
+    def draw_upgrade_panel(self, surface, tower):
+        panel_rect = pygame.Rect(SCREEN_WIDTH-230, 60, 220, 140)
+        pygame.draw.rect(surface, (250, 245, 220), panel_rect)
+        pygame.draw.rect(surface, (80, 70, 60), panel_rect, 2)
+        title = self.font.render("塔升級", True, (60, 50, 50))
+        surface.blit(title, (panel_rect.x+60, panel_rect.y+10))
+
+        info = [
+            f"等級: {tower.level}/{tower.max_level}",
+            f"攻擊力: {tower.damage}",
+            f"射速: {tower.attack_speed:.2f} 秒/發"
+        ]
+        for i, text in enumerate(info):
+            txt = pygame.font.SysFont(FONT_NAME, 18).render(text, True, (50, 50, 90))
+            surface.blit(txt, (panel_rect.x+18, panel_rect.y+50+i*27))
+
+        if tower.can_upgrade():
+            upgrade_btn = pygame.Rect(panel_rect.x+40, panel_rect.y+100, 140, 30)
+            pygame.draw.rect(surface, (100, 180, 90), upgrade_btn)
+            pygame.draw.rect(surface, (60, 90, 50), upgrade_btn, 2)
+            cost = tower.upgrade_cost()
+            btn_txt = self.font.render(f"升級 (${cost})", True, (20, 40, 20))
+            surface.blit(btn_txt, (upgrade_btn.x+16, upgrade_btn.y+4))
+            # 檢查升級點擊
+            mouse_pos = pygame.mouse.get_pos()
+            if pygame.mouse.get_pressed()[0] and upgrade_btn.collidepoint(mouse_pos):
+                if tower.upgrade():
+                    # 升級成功音效可加
+                    pass
+        else:
+            txt = self.font.render("已達最高等級", True, (180, 60, 60))
+            surface.blit(txt, (panel_rect.x+42, panel_rect.y+100))
+
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            pos = pygame.mouse.get_pos()
+            for rect, tower_cls, _ in self.tower_buttons:
+                if rect.collidepoint(pos):
+                    self.game_manager.selected_tower_type = tower_cls
+                    self.selected_tower = None
+                    return True
+            # 點擊地圖上的塔
+            for tower in self.game_manager.towers:
+                if tower.rect.collidepoint(pos):
+                    self.selected_tower = tower
+                    self.game_manager.selected_tower_type = None
+                    return True
+            # 點擊升級按鈕
+            if self.selected_tower:
+                upg_rect = pygame.Rect(SCREEN_WIDTH-230+40, 60+100, 140, 30)
+                if upg_rect.collidepoint(pos) and self.selected_tower.can_upgrade():
+                    if self.selected_tower.upgrade():
+                        # 升級成功後可加音效等
+                        pass
+                    else:
+                        # 金錢不足等提示
+                        pass
+                    return True  # 事件已處理
+            self.selected_tower = None
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
+            self.selected_tower = None
+        return False
+
+    def draw_upgrade_panel(self, surface, tower):
+        panel_rect = pygame.Rect(SCREEN_WIDTH-230, 60, 220, 140)
+        pygame.draw.rect(surface, (250, 245, 220), panel_rect)
+        pygame.draw.rect(surface, (80, 70, 60), panel_rect, 2)
+        title = self.font.render("塔升級", True, (60, 50, 50))
+        surface.blit(title, (panel_rect.x+60, panel_rect.y+10))
+
+        info = [
+            f"等級: {tower.level}/{tower.max_level}",
+            f"攻擊力: {tower.damage}",
+            f"射速: {tower.attack_speed:.2f} 秒/發"
+        ]
+        for i, text in enumerate(info):
+            txt = pygame.font.SysFont(FONT_NAME, 18).render(text, True, (50, 50, 90))
+            surface.blit(txt, (panel_rect.x+18, panel_rect.y+50+i*27))
+
+        if tower.can_upgrade():
+            upgrade_btn = pygame.Rect(panel_rect.x+40, panel_rect.y+100, 140, 30)
+            pygame.draw.rect(surface, (100, 180, 90), upgrade_btn)
+            pygame.draw.rect(surface, (60, 90, 50), upgrade_btn, 2)
+            cost = tower.upgrade_cost()
+            btn_txt = self.font.render(f"升級 (${cost})", True, (20, 40, 20))
+            surface.blit(btn_txt, (upgrade_btn.x+16, upgrade_btn.y+4))
+        else:
+            txt = self.font.render("已達最高等級", True, (180, 60, 60))
+            surface.blit(txt, (panel_rect.x+42, panel_rect.y+100))

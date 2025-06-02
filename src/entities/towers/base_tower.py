@@ -9,12 +9,16 @@ class BaseTower(BaseEntity):
     attack_speed = 1.0  # seconds
     damage = 10
 
+    upgrade_cost_factor = 1.5  # 每級升級費用倍率
+    max_level = 3
+
     def __init__(self, x, y, game_manager):
         image = pygame.Surface((TILE_SIZE, TILE_SIZE), pygame.SRCALPHA)
         pygame.draw.circle(image, (120, 120, 120), (TILE_SIZE//2, TILE_SIZE//2), TILE_SIZE//2)
         super().__init__(x, y, image)
         self.game_manager = game_manager
         self.attack_cooldown = 0
+        self.level = 1
 
     def update(self, dt):
         self.attack_cooldown -= dt
@@ -38,3 +42,19 @@ class BaseTower(BaseEntity):
         dx = self.x - entity.x
         dy = self.y - entity.y
         return (dx*dx + dy*dy) ** 0.5
+
+    def get_upgrade_cost(self):
+        # 第1級升2級: cost*upgrade_cost_factor，第2級升3級: cost*upgrade_cost_factor^2
+        if self.level < self.max_level:
+            return int(self.cost * (self.upgrade_cost_factor ** self.level))
+        return None
+
+    def upgrade(self):
+        if self.level < self.max_level:
+            self.level += 1
+            self.damage = int(self.damage * 1.5)
+            self.range = int(self.range * 1.1)
+            self.attack_speed = max(0.1, self.attack_speed * 0.85)
+            # 可在這裡根據level調整外觀
+            return True
+        return False

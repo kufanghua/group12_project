@@ -1,9 +1,6 @@
 import pygame
 
 class BaseEntity(pygame.sprite.Sprite):
-    """
-    遊戲世界中所有物件的基底類別
-    """
     def __init__(self, x, y, image=None, hp=1):
         super().__init__()
         self.x = x
@@ -22,7 +19,7 @@ class BaseEntity(pygame.sprite.Sprite):
 
     def draw(self, surface):
         """
-        畫出物件
+        畫出物件（僅本體，血條在子類覆寫）
         """
         surface.blit(self.image, self.rect.topleft)
 

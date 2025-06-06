@@ -55,6 +55,14 @@ class GameManager:
         self.entities.draw(self.screen)
         self.ui.draw(self.screen)
 
+        # 畫所有敵人（這裡會顯示血條和百分比）
+        for enemy in self.enemies:
+            enemy.draw(self.screen)
+        # 畫所有塔
+        for tower in self.towers:
+            tower.draw(self.screen)
+        # ...畫UI等其他畫面
+
     def check_collisions(self):
         # 投射物擊中敵人
         for projectile in self.projectiles:

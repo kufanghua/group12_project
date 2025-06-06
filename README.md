@@ -1,68 +1,100 @@
 # Tower Defense OOP Project
 
-本專案是一個以 Python 物件導向設計（OOP）為核心的塔防遊戲專案範例，適合用於教學、學習及程式設計練習。遊戲特色包括多樣化的塔與敵人類型、波數挑戰、基礎動畫與音效、易於擴充的模組化架構。
+本專案是一個以 Python 物件導向設計（OOP）為核心的塔防遊戲範例，適合用於教學、學習及程式設計練習。遊戲內容豐富、結構清晰，便於日後維護與擴充。
 
-## 目錄結構
+---
+
+## 專案目錄結構
 
 ```
-tower-defense-oop/
-├── README.md
-├── requirements.txt
-├── .gitignore
-├── main.py
-├── docs/
-├── src/
-├── assets/
-├── tests/
-└── screenshots/
+group12_project/
+├── README.md                # 專案說明文件
+├── requirements.txt         # 依賴套件
+├── main.py                  # 主程式入口
+├── docs/                    # 文件資料夾
+├── src/                     # 遊戲核心原始碼
+│   ├── game/                # 遊戲管理、流程
+│   ├── entities/            # 遊戲單位（塔、敵人、投射物）
+│   ├── ui/                  # 介面與UI模組
+│   └── utils/               # 輔助工具
+├── assets/                  # 圖片、音效等資源
+├── tests/                   # 單元測試
+└── screenshots/             # 遊戲截圖與動畫
 ```
 
-- `main.py`：主程式入口
-- `docs/`：玩法、設計與說明文件
-- `src/`：遊戲所有原始碼，依功能模組劃分
-- `assets/`：圖片、音效等資源
-- `tests/`：單元測試
-- `screenshots/`：遊戲截圖與示範動畫
+---
 
-## 遊戲玩法
+## 遊戲玩法與功能特色
 
-- 建造不同種類的防禦塔，阻止敵人通過地圖終點
-- 每種塔有不同射程、攻擊方式及特殊效果
-- 敵人有基本型、快速型、坦克型等
-- 支援多波敵人進攻
-- 金錢與升級系統
+- 以滑鼠操作放置/升級防禦塔，阻止敵人穿越地圖終點
+- 多種塔（加農砲塔、機槍塔、冰凍塔），具有不同攻擊方式與特殊效果
+    - 加農砲塔：高傷害，範圍攻擊，射速較慢
+    - 機槍塔：單體傷害，射速快，攻擊力較低
+    - 冰凍塔：可減速敵人，輔助型
+- 多種敵人（基本型、快速型、坦克型），移動速度與血量各異
+- 投射物支援多型（砲彈、子彈、冰球），冰球命中可大幅減速敵人
+- 金錢與升級系統：擊敗敵人獲取金錢，用以建塔或升級現有防禦塔
+- 升級面板可即時顯示塔等級、攻擊力、射速等資訊，並有升級上限提示
+- 多波敵人進攻，波數越高難度越高
+- 即時分數統計與結算
+- 豐富音效（建塔、升級、射擊、敵人死亡等），提升遊戲體驗
+- 主選單與遊戲結束畫面，操作流程順暢
+- 支援單元測試，方便驗證功能正確性
 
-更多玩法請見 [docs/gameplay.md](docs/gameplay.md)。
+---
 
-## OOP 設計原則
+## 近期主要功能更新
 
-- 採用物件導向設計，模組化拆分
-- 不同塔、敵人、投射物皆為獨立類別，便於擴充
-- 遊戲管理、波數管理、地圖管理等皆抽象為管理器
-- 具備良好繼承與多型設計
+- 新增「冰球」投射物（IceBall），可對敵人造成短暫減速效果
+- UI 升級面板優化，點擊塔即顯示升級資訊與按鈕
+- 完善塔的升級機制，升級屬性於 UI 面板顯示且有等級上限提示
+- 音效與資源分類更清楚，方便日後擴充
+- 強化 OOP 結構，新增/擴充塔、防禦單位、UI 組件更為方便
+- 增加主選單/遊戲結束切換，提升遊戲體驗
 
-詳細設計請見 [docs/oop_design.md](docs/oop_design.md)。
+---
+
+## 物件導向架構總覽
+
+- **遊戲管理模組 (`src/game/`)**
+    - `GameManager`：統籌遊戲流程與狀態管理
+    - `MapManager`：地圖與建塔格管理
+    - `WaveManager`：波數與敵人出現時序管理
+- **遊戲單位模組 (`src/entities/`)**
+    - `BaseEntity`：所有遊戲物件基底類別
+    - `towers/`：各類塔與升級邏輯
+    - `enemies/`：各類敵人
+    - `projectiles/`：各類投射物（如砲彈、冰球）
+- **UI 模組 (`src/ui/`)**
+    - `GameUI`：遊戲中資訊展示與操作
+    - `Menu`：主選單與結算畫面
+- **輔助模組 (`src/utils/`)**
+    - `constants.py`：全域常數
+    - `helpers.py`：輔助函式
+    - `animation.py`：動畫處理
+
+---
 
 ## 安裝與執行
 
-### 1. 安裝需求套件
+1. 安裝需求套件（建議 Python 3.9+）
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-建議使用 Python 3.9+，於專案根目錄執行：
+2. 執行遊戲
+    ```bash
+    python main.py
+    ```
 
-```bash
-pip install -r requirements.txt
-```
-
-### 2. 執行遊戲
-
-```bash
-python main.py
-```
+---
 
 ## 主要依賴
 
 - pygame
-- 其他詳見 `requirements.txt`
+- 其餘詳見 `requirements.txt`
+
+---
 
 ## 測試
 
@@ -70,18 +102,22 @@ python main.py
 python -m unittest discover tests
 ```
 
-## 截圖與動畫
+---
+
+## 遊戲截圖與動畫
 
 - ![遊戲畫面1](screenshots/gameplay1.png)
 - ![遊戲畫面2](screenshots/gameplay2.png)
 - ![遊戲demo](screenshots/demo.gif)
 
+---
+
 ## 專案貢獻
 
 歡迎 PR、issue 討論設計與功能擴充。
 
+---
+
 ## 授權
 
 MIT License
-
-https://github.com/copilot/share/82414088-4264-8c21-9003-f04244b549aa

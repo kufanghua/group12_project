@@ -1,87 +1,124 @@
 # Tower Defense OOP Project
 
-本專案是一個以 Python 物件導向設計（OOP）為核心的塔防遊戲專案範例，適合用於教學、學習及程式設計練習。遊戲特色包括多樣化的塔與敵人類型、波數挑戰、基礎動畫與音效、易於擴充的模組化架構。
+本專案是一款以 Python 物件導向程式設計（OOP）為核心實作的塔防遊戲，適合作為教學示範、程式練習或團隊專題。專案結構清晰，便於維護與功能擴充。
 
-## 目錄結構
+---
+
+## 📁 專案目錄結構
 
 ```
-tower-defense-oop/
-├── README.md
-├── requirements.txt
-├── .gitignore
-├── main.py
-├── docs/
-├── src/
-├── assets/
-├── tests/
-└── screenshots/
+group12_project/
+├── README.md                # 專案說明文件
+├── requirements.txt         # 依賴套件列表
+├── main.py                  # 主程式入口
+├── docs/                    # 文件資料夾
+├── src/                     # 遊戲核心原始碼
+│   ├── game/                # 遊戲流程與狀態管理
+│   ├── entities/            # 遊戲單位（塔、敵人、投射物）
+│   │   ├── towers/          # 各類防禦塔
+│   │   ├── enemies/         # 各類敵人
+│   │   └── projectiles/     # 投射物（砲彈、子彈、冰球等）
+│   ├── ui/                  # 遊戲介面與操作模組
+│   └── utils/               # 輔助工具與常數設定
+├── assets/                  # 圖片、音效等資源
+├── tests/                   # 單元測試
+└── screenshots/             # 遊戲截圖與動畫
 ```
 
-- `main.py`：主程式入口
-- `docs/`：玩法、設計與說明文件
-- `src/`：遊戲所有原始碼，依功能模組劃分
-- `assets/`：圖片、音效等資源
-- `tests/`：單元測試
-- `screenshots/`：遊戲截圖與示範動畫
+---
 
-## 遊戲玩法
+## 🎮 遊戲玩法與特色
 
-- 建造不同種類的防禦塔，阻止敵人通過地圖終點
-- 每種塔有不同射程、攻擊方式及特殊效果
-- 敵人有基本型、快速型、坦克型等
-- 支援多波敵人進攻
-- 金錢與升級系統
+- 以滑鼠操作放置/升級防禦塔，阻止敵人穿越地圖終點
+- 多種塔類型與特色技能：
+    - 加農砲塔：高傷害、範圍攻擊，射速較慢
+    - 機槍塔：射速快、單體攻擊，傷害較低
+    - 冰凍塔：輔助型，投擲冰球減速敵人
+- 多種敵人類型（基本型、快速型、坦克型）具不同血量與速度
+- 投射物支援多型態（砲彈、子彈、冰球）
+- 金錢與升級系統：擊敗敵人賺取金錢、建造與升級塔
+- 升級面板顯示塔資訊（等級、傷害、射速），並提示升級上限
+- 多波敵人進攻，隨波數增加難度提升
+- 即時分數計算與結算系統
+- 豐富音效（建塔、攻擊、敵人死亡等）提升遊戲沉浸感
+- 主選單與結束畫面，流程簡潔直覺
+- 單元測試支援，利於功能驗證與開發
 
-更多玩法請見 [docs/gameplay.md](docs/gameplay.md)。
+---
 
-## OOP 設計原則
+## 🆕 近期主要功能更新（v1.3, 2025-05）
 
-- 採用物件導向設計，模組化拆分
-- 不同塔、敵人、投射物皆為獨立類別，便於擴充
-- 遊戲管理、波數管理、地圖管理等皆抽象為管理器
-- 具備良好繼承與多型設計
+- 新增「冰球」投射物（IceBall），命中可減速敵人
+- UI 升級面板優化，點選塔即顯示升級選項與屬性資訊
+- 完善塔的升級機制，支援升級上限提示與數值顯示
+- 音效與資源整理分類，利於後續維護與擴充
+- OOP 架構強化，塔與敵人模組化更清晰，方便擴展
+- 新增主選單與結束畫面，整體流程更順暢
 
-詳細設計請見 [docs/oop_design.md](docs/oop_design.md)。
+---
 
-## 安裝與執行
+## 🧱 架構總覽（OOP 模組）
 
-### 1. 安裝需求套件
+- 遊戲管理模組 (src/game/)
+    - GameManager：主控遊戲流程與狀態
+    - MapManager：地圖邏輯與塔位管理
+    - WaveManager：敵人波數與出場時機管理
+- 遊戲單位模組 (src/entities/)
+    - BaseEntity：所有遊戲物件的基底類別
+    - towers/：各類塔及其升級邏輯
+    - enemies/：敵人種類與行為
+    - projectiles/：投射物邏輯（砲彈、冰球等）
+- UI 模組 (src/ui/)
+    - GameUI：遊戲內資訊顯示與操作介面
+    - Menu：主選單與結束畫面
+- 輔助模組 (src/utils/)
+    - constants.py：全域常數設定
+    - helpers.py：常用輔助函式
+    - animation.py：動畫處理模組
 
-建議使用 Python 3.9+，於專案根目錄執行：
+---
 
-```bash
-pip install -r requirements.txt
-```
+## 🚀 安裝與執行方式
 
-### 2. 執行遊戲
+1. 安裝依賴（建議使用 Python 3.9 以上）
+    ```bash
+    pip install -r requirements.txt
+    ```
+    若遇到 pygame 安裝問題，可嘗試：
+    ```bash
+    python -m pip install pygame --pre
+    ```
 
-```bash
-python main.py
-```
+2. 啟動遊戲
+    ```bash
+    python main.py
+    ```
 
-## 主要依賴
+---
 
-- pygame
-- 其他詳見 `requirements.txt`
+## 🧪 單元測試
 
-## 測試
-
+執行全部測試：
 ```bash
 python -m unittest discover tests
 ```
 
-## 截圖與動畫
+---
+
+## 📸 遊戲截圖與動畫
 
 - ![遊戲畫面1](screenshots/gameplay1.png)
 - ![遊戲畫面2](screenshots/gameplay2.png)
-- ![遊戲demo](screenshots/demo.gif)
+- ![遊戲 Demo](screenshots/demo.gif)
 
-## 專案貢獻
+---
 
-歡迎 PR、issue 討論設計與功能擴充。
+## 📌 專案貢獻
 
-## 授權
+歡迎提交 Pull Request、開 issue 討論功能與設計！若您有想法、bug 回報或擴充建議，請隨時與我們交流。
 
-MIT License
+---
 
-https://github.com/copilot/share/82414088-4264-8c21-9003-f04244b549aa
+## 📄 授權條款
+
+本專案採用 MIT License 授權，歡迎自由使用與修改。
